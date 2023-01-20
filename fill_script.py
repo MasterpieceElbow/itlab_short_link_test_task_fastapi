@@ -7,7 +7,8 @@ from httpx import AsyncClient
 
 CHARACTERS = string.ascii_letters + string.digits
 COROUTINS_NUM = 20
-ITTERATION_PER_COROUTINE = 1_000_000 // COROUTINS_NUM
+ITTERATION_PER_COROUTINE = 100_000 // COROUTINS_NUM
+PERCENT_COUNT = ITTERATION_PER_COROUTINE // (100 // COROUTINS_NUM)
 
 
 def create_salt() -> str:
@@ -24,7 +25,7 @@ async def create_requests():
                     "days_to_expire": 90,
                 }),
             )
-            if n_iteration % 1000 == 0:
+            if n_iteration % PERCENT_COUNT == 0:
                 print(f"{100 * n_iteration // ITTERATION_PER_COROUTINE}% completed")
 
 
