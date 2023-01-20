@@ -25,6 +25,16 @@ def get_links(db: Session = Depends(get_db)):
     return crud.get_links(db=db)
 
 
+@app.get("/{link_name}/", response_model=schemas.LinkResponse)
+def get_link(link_name: str, db: Session = Depends(get_db)):
+    link_db = crud.get_link_by_name(name=link_name, db=db)
+
+    if not link_db or datetime.now() > link_db.created_at + timedelta(days=link_db.days_to_expire):
+        raise missing_link_exception
+    
+    return RedirectResponse(link_db.destination_url)
+
+
 @app.post("/links/", response_model=schemas.LinkResponse)
 def create_link(link: schemas.LinkCreate, db: Session = Depends(get_db)):
     link_db = crud.get_link_by_destination_url(destination_url=link.destination_url, db=db)
@@ -48,13 +58,3 @@ def create_link(link: schemas.LinkCreate, db: Session = Depends(get_db)):
     new_link = crud.create_link(link=link, db=db)
     db.commit()
     return new_link
-
-
-@app.get("/{link_name}/", response_model=schemas.LinkResponse)
-def get_link(link_name: str, db: Session = Depends(get_db)):
-    link_db = crud.get_link_by_name(name=link_name, db=db)
-
-    if not link_db or datetime.now() > link_db.created_at + timedelta(days=link_db.days_to_expire):
-        raise missing_link_exception
-    
-    return RedirectResponse(link_db.destination_url)
