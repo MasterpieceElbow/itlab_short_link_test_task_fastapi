@@ -6,9 +6,9 @@ from httpx import AsyncClient
 
 
 CHARACTERS = string.ascii_letters + string.digits
-COROUTINS_NUM = 20
-ITTERATION_PER_COROUTINE = 100_000 // COROUTINS_NUM
-PERCENT_COUNT = ITTERATION_PER_COROUTINE // (100 // COROUTINS_NUM)
+COROUTINES_NUM = 10
+ITTERATION_PER_COROUTINE = 100_000 // COROUTINES_NUM
+PERCENT_COUNT = ITTERATION_PER_COROUTINE // (100 // COROUTINES_NUM)
 
 
 def create_salt() -> str:
@@ -26,14 +26,12 @@ async def create_requests():
                 }),
             )
             if n_iteration % PERCENT_COUNT == 0:
-                print(f"{100 * n_iteration // ITTERATION_PER_COROUTINE}% completed")
+                print(f"{n_iteration=}, {100 * n_iteration // ITTERATION_PER_COROUTINE}% completed")
 
 
 async def main():
-    await asyncio.gather(*[create_requests() for _ in range(COROUTINS_NUM)])
+    await asyncio.gather(*[create_requests() for _ in range(COROUTINES_NUM)])
 
-
-asyncio.run(main())
 
 if __name__ == "__main__":
     asyncio.run(main())
