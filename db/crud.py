@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from db import models
 from schemas import schemas
-from config import LINK_NAME_LENGHT, DOMAIN_ADDRESS
+from config import LINK_NAME_LENGHT
 
 
 CHARACTERS = string.ascii_letters + string.digits

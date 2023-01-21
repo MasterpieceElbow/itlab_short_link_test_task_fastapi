@@ -48,7 +48,8 @@ def create_link(
 ):
     if not MIN_DAYS_TO_EXPIRE <= link.days_to_expire <= MAX_DAYS_TO_EXPIRE:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Days to expire should be in 1 - 365 interval"
+            status_code=status.HTTP_400_BAD_REQUEST, 
+            detail="Days to expire should be in 1 - 365 interval",
         )
 
     link_db = crud.get_link_by_destination_url(destination_url=link.destination_url, db=db)
@@ -62,16 +63,10 @@ def create_link(
         response.status_code = status.HTTP_200_OK
         return link_db
 
-    # if created without salt - only update created_at and expires_at
+    # if expired - only update created_at and expires_at
     # expired link is inaccessible unless it was recreated
-    if not link_db.salt:
-        now = datetime.now()
-        link_db.created_at = now
-        link_db.expires_at = now + timedelta(days=link.days_to_expire)
-        db.commit()
-        return link_db
-
-    # if expired and created with salt - create the brand new one
-    new_link = crud.create_link(link=link, db=db)
+    now = datetime.now()
+    link_db.created_at = now
+    link_db.expires_at = now + timedelta(days=link.days_to_expire)
     db.commit()
-    return new_link
+    return link_db
