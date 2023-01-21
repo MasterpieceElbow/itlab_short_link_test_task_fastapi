@@ -4,14 +4,17 @@ import asyncio
 import json
 from httpx import AsyncClient
 
+from config import DOMAIN_ADDRESS
+
 
 CHARACTERS = string.ascii_letters + string.digits
 COROUTINES_NUM = 10
 ITTERATION_PER_COROUTINE = 100_000 // COROUTINES_NUM
 PERCENT_COUNT = ITTERATION_PER_COROUTINE // (100 // COROUTINES_NUM)
+ADDRESS = f"{DOMAIN_ADDRESS}links/"
 
 
-def create_salt() -> str:
+def create_hash() -> str:
     return "".join(random.sample(CHARACTERS, k=11))
 
 
@@ -19,9 +22,9 @@ async def create_requests():
     async with AsyncClient() as client:
         for n_iteration in range(ITTERATION_PER_COROUTINE):
             await client.post(
-                "http://127.0.0.1:8000/links/", 
+                ADDRESS, 
                 data=json.dumps({
-                    "destination_url": f"https://www.youtube.com/watch?v={create_salt()}",
+                    "destination_url": f"https://www.youtube.com/watch?v={create_hash()}",
                     "days_to_expire": 90,
                 }),
             )
