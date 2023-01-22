@@ -1,15 +1,15 @@
 import random
 import string
 import asyncio
-import json
 from httpx import AsyncClient
 
 from config import DOMAIN_ADDRESS
 
 
 CHARACTERS = string.ascii_letters + string.digits
+TOTAL_REQUESTS = 200_000
 COROUTINES_NUM = 10
-ITTERATION_PER_COROUTINE = 100_000 // COROUTINES_NUM
+ITTERATION_PER_COROUTINE = TOTAL_REQUESTS // COROUTINES_NUM
 PERCENT_COUNT = ITTERATION_PER_COROUTINE // (100 // COROUTINES_NUM)
 ADDRESS = f"{DOMAIN_ADDRESS}links/"
 
@@ -23,10 +23,10 @@ async def create_requests():
         for n_iteration in range(ITTERATION_PER_COROUTINE):
             await client.post(
                 ADDRESS, 
-                data=json.dumps({
-                    "destination_url": f"https://www.youtube.com/watch?v={create_hash()}",
+                json={
                     "days_to_expire": 90,
-                }),
+                    "destination_url": f"https://www.youtube.com/watch?v={create_hash()}"
+                },
             )
             if n_iteration % PERCENT_COUNT == 0:
                 print(f"{n_iteration=}, {100 * n_iteration // ITTERATION_PER_COROUTINE}% completed")
