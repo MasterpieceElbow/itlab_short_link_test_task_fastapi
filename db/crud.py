@@ -1,7 +1,8 @@
 import hashlib, base64, random, string
 from datetime import datetime, timedelta
 
-from sqlalchemy.orm import Session
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from db import models
 from schemas import schemas
@@ -11,16 +12,19 @@ from config import LINK_NAME_LENGHT
 CHARACTERS = string.ascii_letters + string.digits
 
 
-def get_links(db: Session, offset: int, limit: int):
-    return db.query(models.Link).limit(limit).offset(offset).all()
+async def get_links(db: AsyncSession, offset: int, limit: int):
+    links = await db.execute(select(models.Link).limit(limit).offset(offset).order_by(models.Link.id))
+    return links.scalars().all()
 
 
-def get_link_by_destination_url(destination_url: str, db: Session) -> models.Link:
-    return db.query(models.Link).filter_by(destination_url=destination_url).first()
+async def get_link_by_destination_url(destination_url: str, db: AsyncSession) -> models.Link:
+    links = await db.execute(select(models.Link).filter_by(destination_url=destination_url))
+    return links.scalars().first()
 
 
-def get_link_by_name(name: str, db: Session) -> models.Link:
-    return db.query(models.Link).filter_by(name=name).first()
+async def get_link_by_name(name: str, db: AsyncSession) -> models.Link:
+    links = await db.execute(select(models.Link).filter_by(name=name))
+    return links.scalars().first()
 
 
 def create_hash(text: str) -> str:
@@ -35,12 +39,12 @@ def create_salt() -> str:
     return "".join(random.sample(CHARACTERS, k=15))
 
 
-def create_link(link: schemas.LinkCreate, db: Session) -> models.Link:
+async def create_link(link: schemas.LinkCreate, db: AsyncSession) -> models.Link:
     name = create_hash(text=link.destination_url)
     expires_at = datetime.now() + timedelta(days=link.days_to_expire)
 
     # chech for collision
-    if not get_link_by_name(name=name, db=db):
+    if not await get_link_by_name(name=name, db=db):
         link_db = models.Link(
             name=name, 
             destination_url=link.destination_url,
@@ -56,8 +60,8 @@ def create_link(link: schemas.LinkCreate, db: Session) -> models.Link:
         name = create_hash(text=link.destination_url + salt)
         names_with_salt[name] = salt
 
-    db_names = db.query(models.Link.name).filter(models.Link.name.in_(names_with_salt.keys()))
-    db_names_set = set(db.scalars(db_names).all())
+    db_names = await db.execute(select(models.Link.name).filter(models.Link.name.in_(names_with_salt.keys())))
+    db_names_set = set(db_names.scalars().all())
 
     for name in names_with_salt:
         if name in db_names_set:

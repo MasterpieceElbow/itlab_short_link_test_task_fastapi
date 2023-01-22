@@ -4,3 +4,5 @@ uvicorn==0.20.0
 httpx
 psycopg2-binary
 python-dotenv
+async-sqlalchemy
+greenlet
