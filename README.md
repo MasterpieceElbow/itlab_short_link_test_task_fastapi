@@ -28,7 +28,7 @@ Venv:
 - Install requirements `pip install -r requirements.txt`
    
 DB and run server:
-- Create DB: user:`postgres`, password:`postgres`, host:`localhost`, dbname: `shorturl` and uncomment `SQLALCHEMY_DATABASE_URL` in db/database.py or create a db with the custom creds and specify them there
+- Create DB: user:`postgres`, password:`postgres`, host:`localhost`, dbname: `shorturl` or create a db with the custom creds and specify them in `config.py` in `SQLALCHEMY_DATABASE_URL`
 - Launch server `uvicorn main:app --reload`
 - Restore data `psql shorturl < db.dump`
 - Check API endpoints docs:  `http://127.0.0.1:8000/docs`
