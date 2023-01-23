@@ -40,4 +40,4 @@ Short url includes 6 characters. Each character is a lowercase letter/uppercase 
 Current implementation keep short url unique. It is not possible to get the same short url that was created before.
 Alternative possible implementations:
 - Reuse created short urls if they are expired for other destination urls.
-- Dynamic length of the short url, for example, start with 4 and increase if many collisions will happen.
+- Dynamic length of the short url, for example, start with 4 and may increase if many collisions happen.
