@@ -35,7 +35,7 @@ DB and run server:
 
 ## 1.5 Implementation details
 
-Short url includes 6 characters. Each character is a lowercase letter/uppercase letter/digit. Total unique combinations = 66^6 ~ 82.6 * 10^9. If a collision is happening, url is created upon a destination url + salt to avoid it.
+Short url includes 6 characters. Each character is a lowercase letter/uppercase letter/digit. Total unique combinations = 64^6 ~ 68.7 * 10^9. If a collision is happening, url is created upon a destination url + salt to avoid it.
 
 Current implementation keep short url unique. It is not possible to get the same short url that was created before.
 Alternative possible implementations:
